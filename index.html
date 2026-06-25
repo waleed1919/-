@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>تسجيل الدخول | نظام TX الذكي</title>
+    
+    <!-- PWA Meta Tags (محدّث) -->
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Weso">
+    <link rel="apple-touch-icon" href="Untitled_logo_9_free-file.png">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Service Worker Registration (محدّث) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log("تم تسجيل تطبيق PWA بنجاح", reg.scope))
+                    .catch(err => console.log("فشل تسجيل PWA:", err));
+            });
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --accent: #34D399;
+            --success: #059669;
+            --error: #EF4444;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(16, 185, 129, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(180deg, #F8FAFC 0%, #ECFDF5 50%, #D1FAE5 100%);
+        }
+
+        .submit-btn .btn-text, .trial-badge, .watermark-text {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1.5px;
+        }
+
+        .bg-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            width: 60%;
+            max-width: 500px;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+            filter: grayscale(100%);
+        }
+
+        .bg-container {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: floatOrb 25s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(5, 150, 105, 0.15) 0%, transparent 70%);
+            bottom: -120px;
+            left: -80px;
+            animation-delay: -8s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.2) 0%, transparent 70%);
+            top: 40%;
+            left: 30%;
+            animation-delay: -16s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(40px, -50px) scale(1.08); }
+            50% { transform: translate(-30px, 30px) scale(0.92); }
+            75% { transform: translate(50px, 40px) scale(1.04); }
+        }
+
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 40s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        .loader-wrapper {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, #F2F6FF 0%, #E8F4FF 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-wrapper.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .ios-spinner {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .ios-spinner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3px solid rgba(16, 185, 129, 0.12);
+            border-radius: 50%;
+        }
+
+        .ios-spinner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: var(--primary);
+            border-radius: 50%;
+            animation: iosSpin 0.7s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+        }
+
+        @keyframes iosSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            margin-top: 24px;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(50px);
+            -webkit-backdrop-filter: blur(50px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 44px 36px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 
+                0 25px 70px rgba(16, 185, 129, 0.12),
+                0 10px 30px rgba(0, 0, 0, 0.04),
+                inset 0 1px 1px rgba(255, 255, 255, 0.7);
+            opacity: 0;
+            transform: translateY(40px) scale(0.94);
+            animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.15s;
+        }
+
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 28px;
+            opacity: 0;
+            transform: scale(0.4) rotate(-10deg);
+            animation: logoPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes logoPop {
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .main-logo {
+            width: 95px;
+            height: 95px;
+            border-radius: 24px;
+            box-shadow: 
+                0 12px 35px rgba(16, 185, 129, 0.22),
+                0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .main-logo:hover {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .header-section h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.55s ease-out forwards;
+            animation-delay: 0.55s;
+        }
+
+        .header-section .subtitle {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.55s ease-out forwards;
+            animation-delay: 0.65s;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-container {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1.5px solid rgba(239, 68, 68, 0.18);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 26px;
+            display: none;
+            opacity: 0;
+            transform: scale(0.92);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .error-container.show {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+            animation: shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(3px); }
+            30%, 50%, 70% { transform: translateX(-5px); }
+            40%, 60% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .activate-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .activate-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .activate-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(25px);
+            animation: slideUp 0.55s ease-out forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.75s; }
+        .form-group:nth-child(2) { animation-delay: 0.85s; }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1.5px solid rgba(16, 185, 129, 0.12);
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            color: #1a1a1a;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #999;
+            font-weight: 400;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 
+                0 0 0 5px rgba(16, 185, 129, 0.08),
+                0 6px 20px rgba(16, 185, 129, 0.1);
+            transform: scale(1.015);
+        }
+
+        .input-highlight {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: all 0.35s ease;
+            transform: translateX(-50%);
+            border-radius: 0 0 16px 16px;
+        }
+
+        .input-wrapper input:focus ~ .input-highlight {
+            width: 100%;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(25px);
+            animation: slideUp 0.55s ease-out forwards;
+            animation-delay: 0.95s;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 
+                0 10px 30px rgba(16, 185, 129, 0.25),
+                0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px) scale(1.025);
+            box-shadow: 
+                0 15px 40px rgba(16, 185, 129, 0.35),
+                0 8px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 18px rgba(16, 185, 129, 0.22);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn.loading {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .submit-btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .submit-btn .btn-loader {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+
+        .submit-btn.loading .btn-loader {
+            opacity: 1;
+        }
+
+        .btn-loader .dot {
+            width: 7px;
+            height: 7px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 4px;
+            animation: dotBounce 0.55s ease-in-out infinite;
+        }
+
+        .btn-loader .dot:nth-child(2) { animation-delay: 0.12s; }
+        .btn-loader .dot:nth-child(3) { animation-delay: 0.24s; }
+
+        @keyframes dotBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .watermark-text {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            color: rgba(16, 185, 129, 0.18);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .side-watermark-logo {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 100;
+            filter: grayscale(100%);
+        }
+
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(25px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.45s ease;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-checkmark {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success) 0%, #2DB657 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 50px rgba(5, 150, 105, 0.35);
+            transform: scale(0);
+            animation: successPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.15s;
+        }
+
+        @keyframes successPop {
+            to { transform: scale(1); }
+        }
+
+        .success-checkmark svg {
+            width: 44px;
+            height: 44px;
+            stroke: white;
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .success-checkmark .check-path {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            animation: drawCheck 0.45s ease-out forwards;
+            animation-delay: 0.45s;
+        }
+
+        @keyframes drawCheck {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .success-text {
+            margin-top: 28px;
+            font-size: 19px;
+            font-weight: 700;
+            color: #1a1a1a;
+            opacity: 0;
+            transform: translateY(12px);
+            animation: slideUp 0.45s ease-out forwards;
+            animation-delay: 0.55s;
+        }
+
+        .trial-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.06);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 20px;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 1.1s;
+        }
+
+        .trial-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--success);
+            padding: 16px 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(5, 150, 105, 0.2);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .success-notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .success-notification .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .success-notification .text {
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+
+        .transition-scene {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .transition-scene.show {
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50vw;
+            height: 100vh;
+            background: #ffffff;
+            transition: transform 0.8s cubic-bezier(0.64, 0, 0.78, 0);
+            z-index: 1;
+        }
+
+        .curtain-left { 
+            left: 0; 
+            transform: translateX(-100%); 
+            border-right: 3px solid var(--primary); 
+        }
+        .curtain-right { 
+            right: 0; 
+            transform: translateX(100%); 
+            border-left: 3px solid var(--primary); 
+        }
+
+        .transition-scene.show .curtain-left,
+        .transition-scene.show .curtain-right { 
+            transform: translateX(0); 
+        }
+
+        .transition-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s ease 0.7s;
+        }
+
+        .transition-scene.show .transition-content {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .logo-reveal img {
+            width: 110px;
+            height: 110px;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
+            margin-bottom: 25px;
+            animation: floatLogo 2s ease-in-out infinite;
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .loading-bar-container {
+            width: 260px;
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.8s;
+        }
+
+        .transition-scene.show .loading-bar {
+            width: 100%;
+        }
+
+        .transition-text {
+            color: var(--primary-dark);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 36px 28px;
+                border-radius: 28px;
+            }
+
+            .header-section h2 {
+                font-size: 24px;
+            }
+
+            .input-wrapper input {
+                padding: 16px 18px;
+                font-size: 15px;
+            }
+
+            .submit-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .bg-watermark {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="assets/Untitled_logo_7_free-file.png" class="bg-watermark" alt="Watermark">
+
+    <div class="bg-container">
+        <div class="grid-pattern"></div>
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+    </div>
+
+    <div id="loader" class="loader-wrapper">
+        <div class="ios-spinner"></div>
+        <p class="loader-text">جاري التحقق...</p>
+    </div>
+
+    <div id="successOverlay" class="transition-scene">
+        <div class="transition-content">
+            <div class="logo-reveal">
+                <img src="assets/Untitled_logo_7_free-file.png" alt="TX Logo">
+            </div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <h2 class="transition-text">جاري تهيئة مساحة العمل...</h2>
+        </div>
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+    </div>
+
+    <div class="watermark-text">WhatsApp: +20 12 82585337</div>
+    <img src="assets/Untitled_logo_7-free-file.png" class="side-watermark-logo" alt="">
+
+    <div class="main-container">
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="assets/Untitled_logo_7_free-file.png" alt="TX Logo" class="main-logo">
+            </div>
+
+            <div class="header-section">
+                <h2>تسجيل الدخول</h2>
+                <p class="subtitle">يرجى إدخال بيانات الدخول للوصول إلى النظام</p>
+            </div>
+
+            <div id="errorBox" class="error-container">
+                <span id="errorMessage" class="error-message">ERR: البيانات غير صحيحة</span>
+                <a href="https://wa.me/201282585337" target="_blank" class="activate-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    تواصل للدعم الفني
+                </a>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off">
+                    <div class="input-highlight"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="password" id="activationKey" placeholder="رمز الدخول" autocomplete="off">
+                    <div class="input-highlight"></div>
+                </div>
+            </div>
+
+            <button id="loginBtn" class="submit-btn">
+                <span class="btn-text">دخول النظام</span>
+                <div class="btn-loader">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </button>
+
+            <div style="text-align: center;">
+                <span class="trial-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    نظام TX PRO للمخازن
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvG_MFpdRBSRwbjra0f2Jf6LRin3nx_1M",
+            authDomain: "inventory-system-pro-6fdf0.firebaseapp.com",
+            projectId: "inventory-system-pro-6fdf0",
+            storageBucket: "inventory-system-pro-6fdf0.firebasestorage.app",
+            messagingSenderId: "506676919781",
+            appId: "1:506676919781:web:e99989d07129917d5a430c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const ADMIN_USER = "X4807";
+        const ADMIN_KEY = "ABDO TX 1234";
+
+        const loginBtn = document.getElementById('loginBtn');
+        const loader = document.getElementById('loader');
+        const errorBox = document.getElementById('errorBox');
+        const errorMessage = document.getElementById('errorMessage');
+        const successOverlay = document.getElementById('successOverlay');
+        const usernameInput = document.getElementById('username');
+        const keyInput = document.getElementById('activationKey');
+
+        function hapticFeedback() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(12);
+            }
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorBox.classList.add('show');
+            hapticFeedback();
+            setTimeout(() => errorBox.classList.remove('show'), 6000);
+        }
+
+        function hideError() {
+            errorBox.classList.remove('show');
+        }
+
+        function setButtonLoading(isLoading) {
+            if (isLoading) {
+                loginBtn.classList.add('loading');
+            } else {
+                loginBtn.classList.remove('loading');
+            }
+        }
+
+        function showSuccessNotification(msg) {
+            const notify = document.createElement('div');
+            notify.className = 'success-notification';
+            notify.innerHTML = `
+                <div class="icon">✓</div>
+                <span class="text">${msg}</span>
+            `;
+            document.body.appendChild(notify);
+            
+            setTimeout(() => notify.classList.add('show'), 10);
+            
+            return notify;
+        }
+
+        function saveSession(data) {
+            Object.keys(data).forEach(key => {
+                localStorage.setItem(key, data[key]);
+            });
+            localStorage.setItem('loginTime', new Date().getTime());
+        }
+
+        function showSuccessAndRedirect(url) {
+            const overlay = document.getElementById('successOverlay');
+            overlay.classList.add('show');
+            hapticFeedback();
+            
+            const notify = document.querySelector('.success-notification.show');
+            if(notify) notify.style.display = 'none';
+
+            setTimeout(() => {
+                window.location.href = url;
+            }, 3200);
+        }
+
+        async function checkLicense(userDoc) {
+            const userData = userDoc.data();
+            const now = new Date();
+
+            if (!userData.firstLoginDate) {
+                await updateDoc(userDoc.ref, {
+                    firstLoginDate: now.toISOString()
+                });
+                return true;
+            }
+
+            const firstLogin = new Date(userData.firstLoginDate);
+            const diffTime = Math.abs(now - firstLogin);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 5) {
+                showError("⚠️ انتهت الفترة التجريبية (5 أيام). يرجى التواصل مع الإدارة للتفعيل.");
+                return false;
+            }
+
+            return true;
+        }
+
+        loginBtn.addEventListener('click', async () => {
+            hapticFeedback();
+            
+            const userVal = usernameInput.value.trim();
+            const keyVal = keyInput.value.trim();
+
+            if (!userVal || !keyVal) {
+                showError("يرجى إدخال اسم المستخدم ورمز الدخول");
+                return;
+            }
+
+            hideError();
+            setButtonLoading(true);
+
+            try {
+                // 1. التحقق من الأدمن أولاً
+                if (userVal === ADMIN_USER && keyVal === ADMIN_KEY) {
+                    saveSession({
+                        'userSession': 'ADMIN_SUCCESS',
+                        'userRole': 'admin'
+                    });
+                    
+                    showSuccessNotification("مرحباً أيها المدير.. جاري الدخول");
+                    setTimeout(() => showSuccessAndRedirect("dashboard.html"), 1200);
+                    return;
+                }
+
+                // 2. التحقق من الموظفين في قاعدة البيانات
+                const q = query(
+                    collection(db, "employees"), 
+                    where("name", "==", userVal), 
+                    where("accessKey", "==", keyVal)
+                );
+                
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const employeeDoc = querySnapshot.docs[0];
+                    const employeeData = employeeDoc.data();
+
+                    const isAllowed = await checkLicense(employeeDoc);
+                    if (!isAllowed) {
+                        setButtonLoading(false);
+                        return;
+                    }
+
+                    saveSession({
+                        'userSession': userVal,
+                        'employeeId': employeeDoc.id,
+                        'userRole': 'staff',
+                        'storeId': employeeData.storeId || ''
+                    });
+
+                    await updateDoc(doc(db, 'employees', employeeDoc.id), { 
+                        isOnline: true,
+                        lastLogin: serverTimestamp()
+                    });
+
+                    showSuccessNotification(`مرحباً ${userVal}.. جاري التحويل`);
+                    setTimeout(() => showSuccessAndRedirect("employee.html"), 1200);
+                    
+                } else {
+                    // 3. التحقق من الشركات
+                    const companyDoc = await getDoc(doc(db, "companies", userVal));
+                    
+                    if (companyDoc.exists()) {
+                        const companyData = companyDoc.data();
+                        
+                        if (companyData.activationKey && companyData.activationKey !== keyVal) {
+                            setButtonLoading(false);
+                            showError("ERR: رمز التفعيل غير صحيح");
+                            return;
+                        }
+
+                        if (companyData.createdAt) {
+                            const startDate = companyData.createdAt.toDate();
+                            const diffInDays = (new Date() - startDate) / (1000 * 60 * 60 * 24);
+                            
+                            if (!companyData.isPremium && diffInDays > 5) {
+                                setButtonLoading(false);
+                                showError("ERR: انتهت صلاحية الفترة التجريبية (5 أيام)");
+                                return;
+                            }
+                        }
+
+                        saveSession({
+                            'userSession': userVal,
+                            'userRole': 'company'
+                        });
+                        
+                        showSuccessNotification("مرحباً بك.. جاري الدخول");
+                        setTimeout(() => showSuccessAndRedirect("dashboard.html"), 1200);
+                    } else {
+                        setButtonLoading(false);
+                        showError("ERR: بيانات الدخول غير صحيحة");
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                setButtonLoading(false);
+                showError("ERR: حدث خطأ في الاتصال بالخادم");
+            }
+        });
+
+        [usernameInput, keyInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') loginBtn.click();
+            });
+
+            input.addEventListener('input', () => {
+                if (errorBox.classList.contains('show')) hideError();
+            });
+        });
+
+        [usernameInput, keyInput].forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.parentElement.style.transform = 'scale(1.015)';
+            });
+            
+            input.addEventListener('blur', () => {
+                input.parentElement.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
