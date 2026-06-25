@@ -1,0 +1,266 @@
+{
+  "short_name": "الفراعنة",
+  "name": "الفراعنة للعقارات - Pharaonic Real Estate Platform",
+  "description": "منصة عقارية ملكية متكاملة لبيع وشراء العقارات في مصر مع جولات افتراضية 360 درجة وخريطة تفاعلية ونظام دردشة مباشر",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080D14",
+  "theme_color": "#D4AF37",
+  "categories": ["business", "lifestyle", "shopping"],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
+  
+  "icons": [
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 0.75
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 1.0
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 1.33
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 1.5
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 1.58
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable",
+      "density": 2.0
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any",
+      "density": 4.0
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable",
+      "density": 5.33
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "إضافة عقار جديد",
+      "short_name": "إضافة عقار",
+      "description": "انشر عقارك مع جولة افتراضية 360 درجة",
+      "url": "/?action=sell",
+      "icons": [
+        {
+          "src": "icons/shortcut-add.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "تصفح العقارات",
+      "short_name": "العقارات",
+      "description": "استعرض العقارات المتاحة للبيع",
+      "url": "/?action=browse",
+      "icons": [
+        {
+          "src": "icons/shortcut-browse.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "الخريطة التفاعلية",
+      "short_name": "الخريطة",
+      "description": "اعرض العقارات على الخريطة",
+      "url": "/?action=map",
+      "icons": [
+        {
+          "src": "icons/shortcut-map.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "حاسبة التمويل",
+      "short_name": "الحاسبة",
+      "description": "احسب أقساط التمويل العقاري",
+      "url": "/?action=calculator",
+      "icons": [
+        {
+          "src": "icons/shortcut-calc.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الصفحة الرئيسية"
+    },
+    {
+      "src": "screenshots/properties.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "قائمة العقارات"
+    },
+    {
+      "src": "screenshots/map.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الخريطة التفاعلية"
+    },
+    {
+      "src": "screenshots/panorama.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "جولة افتراضية 360"
+    }
+  ],
+  
+  "related_applications": [],
+  
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "handle_links": "preferred",
+  
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/upload",
+      "accept": {
+        "image/*": [".png", ".jpg", ".jpeg", ".webp"]
+      }
+    }
+  ],
+  
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "images",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+pharaoh",
+      "url": "/property?id=%s"
+    }
+  ],
+  
+  "widgets": [
+    {
+      "name": "عقارات مميزة",
+      "short_name": "العقارات",
+      "description": "أحدث العقارات المميزة",
+      "monochrome_icons": [
+        {
+          "src": "icons/widget-monochrome.png",
+          "sizes": "128x128",
+          "type": "image/png"
+        }
+      ],
+      "icons": [
+        {
+          "src": "icons/widget.png",
+          "sizes": "128x128",
+          "type": "image/png"
+        }
+      ],
+      "ms_ac_template": "widgets/template.xml",
+      "ms_ac_template_icon": "icons/widget-ac.png",
+      "data": "https://api.pharaoh-realestate.com/widgets/featured",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "screenshots/widget.png",
+          "sizes": "400x200",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "id": "com.pharaoh.realestate.pwa",
+  "version": "2.0.0",
+  "version_name": "الإصدار الثاني - الفراعنة",
+  
+  "generator": "Pharaonic Real Estate Platform",
+  "created_at": "2025-01-15T00:00:00.000Z",
+  "updated_at": "2025-01-15T00:00:00.000Z"
+}
